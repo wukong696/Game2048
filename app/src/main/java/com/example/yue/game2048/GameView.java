@@ -1,6 +1,8 @@
 package com.example.yue.game2048;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -58,19 +60,19 @@ public class GameView extends GridLayout {
                             //判断例如左下方向的滑动，用绝对值判断，如果x绝对值大于y的绝对值就是水平方向的
                             if(offsetX < -5){
                                 swipeLeft();
-                                Toast.makeText(MyApplition.getContext(),"left",Toast.LENGTH_SHORT).show();
+
                             }else if(offsetX > 5 ){
                                 swipeRight();
-                                Toast.makeText(MyApplition.getContext(),"right",Toast.LENGTH_SHORT).show();
+
                             }
                         }
                         else {
                             if (offsetY < -5) {
                                 swipeUp();
-                                Toast.makeText(MyApplition.getContext(), "up", Toast.LENGTH_SHORT).show();
+
                             } else if (offsetY > 5) {
                                 swipeDown();
-                                Toast.makeText(MyApplition.getContext(), "down", Toast.LENGTH_SHORT).show();
+                                
                             }
                         }
                         break;
@@ -104,6 +106,9 @@ public class GameView extends GridLayout {
     }
 
     private void startGame(){
+
+        MainActivity.getMainActivity().clearScore();
+
         for (int y = 0;y < 4; y ++){
             for (int x = 0; x < 4 ;x ++) {
                 cardsMap[x][y].setNum(0);//清除控件的数字
@@ -111,6 +116,7 @@ public class GameView extends GridLayout {
         }
         addRandonNum();
         addRandonNum();
+
 
     }
 
@@ -132,16 +138,176 @@ public class GameView extends GridLayout {
 
     private void swipeLeft(){
 
+        boolean marge = false;
+
+        for (int y = 0; y < 4; y++){
+            for(int x = 0; x < 4; x++){
+
+                for(int x1 = x+1;x1 <4 ; x1++){
+                    if(cardsMap[x1][y].getNum()>0){
+
+                        if(cardsMap[x][y].getNum()<=0){//如果左边的空的，把右边的放左边，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x1][y].getNum());
+                            cardsMap[x1][y].setNum(0);
+                            x--;//最左面的是空的，右边有两个相同数字的控件，避免不会相加而只是位移，
+                            marge = true;
+
+                        }else if (cardsMap[x][y].equals(cardsMap[x1][y])){//如果一样的话，左边直接乘2，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x][y].getNum()*2);
+                            cardsMap[x1][y].setNum(0);
+
+                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            marge = true;
+
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (marge){
+            addRandonNum();
+            checkComplete();
+        }
+
     }
     private void swipeRight(){
+
+        boolean marge = false;
+
+        for (int y = 0; y < 4; y++){
+            for(int x = 3; x >= 0; x--){
+
+                for(int x1 = x-1;x1 >=0 ; x1--){
+                    if(cardsMap[x1][y].getNum()>0){
+
+                        if(cardsMap[x][y].getNum()<=0){
+                            cardsMap[x][y].setNum(cardsMap[x1][y].getNum());
+                            cardsMap[x1][y].setNum(0);
+                            x++;
+                            marge = true;
+
+                        }else if (cardsMap[x][y].equals(cardsMap[x1][y])){
+                            cardsMap[x][y].setNum(cardsMap[x][y].getNum()*2);
+                            cardsMap[x1][y].setNum(0);
+
+                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            marge = true;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (marge){
+            addRandonNum();
+            checkComplete();
+        }
+
 
     }
     private void swipeUp(){
 
+        boolean marge = false;
+
+        for (int x = 0; x < 4; x++){
+            for(int y = 0; y < 4; y++){
+
+                for(int y1 = y+1;y1 <4 ; y1++){
+                    if(cardsMap[x][y1].getNum()>0){
+
+                        if(cardsMap[x][y].getNum()<=0){//如果左边的空的，把右边的放左边，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x][y1].getNum());
+                            cardsMap[x][y1].setNum(0);
+                            y--;//最左面的是空的，右边有两个相同数字的控件，避免不会相加而只是位移，
+                            marge = true;
+                        }else if (cardsMap[x][y].equals(cardsMap[x][y1])){//如果一样的话，左边直接乘2，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x][y].getNum()*2);
+                            cardsMap[x][y1].setNum(0);
+
+                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            marge = true;
+                        }
+                        break;
+
+                    }
+                }
+            }
+        }
+
+        if (marge){
+            addRandonNum();
+            checkComplete();
+        }
+
+
     }
     private void swipeDown(){
 
+        boolean marge = false;
+
+        for (int x = 0; x < 4; x++){
+            for(int y = 3; y >= 0; y--){
+
+                for(int y1 = y-1;y1 >= 0 ; y1--){
+                    if(cardsMap[x][y1].getNum()>0){
+
+                        if(cardsMap[x][y].getNum()<=0){//如果左边的空的，把右边的放左边，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x][y1].getNum());
+                            cardsMap[x][y1].setNum(0);
+                            y++;//最左面的是空的，右边有两个相同数字的控件，避免不会相加而只是位移，
+                            marge = true;
+                        }else if (cardsMap[x][y].equals(cardsMap[x][y1])){//如果一样的话，左边直接乘2，右边清空
+                            cardsMap[x][y].setNum(cardsMap[x][y].getNum()*2);
+                            cardsMap[x][y1].setNum(0);
+
+                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            marge = true;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        if (marge){
+            addRandonNum();
+            checkComplete();
+        }
+
     }
+
+    public void checkComplete(){
+        boolean complete = true;
+
+        ALL:
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                if (cardsMap[x][y].getNum()==0||
+                        (x>0&&cardsMap[x][y].equals(cardsMap[x-1][y]))||
+                        (x<3&&cardsMap[x][y].equals(cardsMap[x+1][y]))||
+                        (y>0&&cardsMap[x][y].equals(cardsMap[x][y-1]))||
+                        (y<3&&cardsMap[x][y].equals(cardsMap[x][y+1]))) {
+
+                    complete = false;
+                    break ALL;
+                }
+            }
+        }
+
+        if (complete) {
+            new AlertDialog.Builder(getContext()).setTitle("你好").setMessage("游戏结束").setPositiveButton("重新开始", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startGame();
+                }
+            }).show();
+        }
+    }
+
+
 
 
 }
